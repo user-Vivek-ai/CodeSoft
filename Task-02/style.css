@@ -1,1 +1,120 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
 
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: white;
+}
+
+.container {
+    text-align: center;
+    background: rgba(255, 255, 255, 0.1);
+    padding: 30px;
+    border-radius: 20px;
+    backdrop-filter: blur(10px);
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.3);
+    max-width: 400px;
+}
+
+h1 {
+    font-size: 3rem;
+    margin-bottom: 20px;
+    text-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+}
+
+.game-info {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+    gap: 15px;
+}
+
+#status {
+    font-size: 1.4rem;
+    font-weight: bold;
+}
+
+#reset-btn {
+    padding: 12px 25px;
+    font-size: 1.1rem;
+    background: #ff4757;
+    color: white;
+    border: none;
+    border-radius: 50px;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+#reset-btn:hover {
+    background: #ff3742;
+    transform: translateY(-3px);
+}
+
+.board {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+    width: 360px;
+    height: 360px;
+    margin: 0 auto;
+    background: rgba(0, 0, 0, 0.2);
+    padding: 10px;
+    border-radius: 15px;
+}
+
+.cell {
+    background: rgba(255, 255, 255, 0.95);
+    color: #333;
+    font-size: 4.5rem;
+    font-weight: bold;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 12px;
+    cursor: pointer;
+    transition: all 0.2s;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+}
+
+.cell:hover {
+    background: rgba(255, 255, 255, 1);
+    transform: scale(1.03);
+}
+
+.cell.x {
+    color: #e74c3c;
+}
+
+.cell.o {
+    color: #3498db;
+}
+
+.controls {
+    margin-top: 20px;
+    font-size: 1.1rem;
+}
+
+.controls label {
+    cursor: pointer;
+}
+
+@media (max-width: 480px) {
+    .board {
+        width: 300px;
+        height: 300px;
+    }
+
+    .cell {
+        font-size: 3.5rem;
+    }
+}
