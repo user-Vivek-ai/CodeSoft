@@ -1,1 +1,467 @@
+<!DOCTYPE html>
+<!-- saved from url=(0079)file:///D:/Internships%20(Unpaid)/Code%20Soft/Task-4/recommendation_system.html -->
+<html lang="en"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Recomendation System • Personalized Recommendations</title>
+  <link rel="stylesheet" href="./1_files/all.min.css">
+  <style>
+    :root {
+      --primary: #1a73e8;
+      --primary-dark: #0d47a1;
+      --text-primary: #1f2937;
+      --text-secondary: #64748b;
+      --text-tertiary: #94a3b8;
+      --bg-primary: #ffffff;
+      --bg-secondary: #f8fafc;
+      --border: #e2e8f0;
+      --radius: 16px;
+      --radius-md: 12px;
+    }
 
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Segoe UI', system-ui, sans-serif;
+      background: #f1f5f9;
+      color: var(--text-primary);
+      padding: 20px 0;
+    }
+
+    .container {
+      max-width: 720px;
+      margin: 0 auto;
+      background: white;
+      border-radius: var(--radius);
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+      overflow: hidden;
+    }
+
+    .header {
+      background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+      padding: 2.5rem 2rem;
+      text-align: center;
+      color: white;
+    }
+
+    .header h1 { font-size: 1.85rem; font-weight: 600; }
+    .main { padding: 2rem; }
+
+    .tabs {
+      display: flex;
+      background: var(--bg-secondary);
+      border-radius: var(--radius-md);
+      padding: 6px;
+      margin-bottom: 2rem;
+      border: 1px solid var(--border);
+    }
+
+    .tab {
+      flex: 1;
+      padding: 14px 20px;
+      border-radius: var(--radius-md);
+      font-weight: 500;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      color: var(--text-secondary);
+    }
+
+    .tab.active {
+      background: white;
+      color: var(--primary);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
+      font-weight: 600;
+    }
+
+    .section-title {
+      font-size: 0.95rem;
+      font-weight: 600;
+      color: var(--text-secondary);
+      margin-bottom: 12px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .pref-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(110px, 1fr));
+      gap: 12px;
+      margin-bottom: 2rem;
+    }
+
+    .pref-chip {
+      padding: 14px 16px;
+      border: 1.5px solid var(--border);
+      border-radius: var(--radius-md);
+      background: var(--bg-secondary);
+      text-align: center;
+      font-size: 0.95rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .pref-chip:hover { border-color: var(--primary); background: #f0f7ff; }
+    .pref-chip.sel {
+      background: #e0f0ff;
+      border-color: var(--primary);
+      color: var(--primary);
+      font-weight: 600;
+    }
+
+    .rating-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 14px 0;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .rating-row:last-child { border-bottom: none; }
+
+    .stars { display: flex; gap: 6px; font-size: 1.5rem; }
+    .star { cursor: pointer; color: #e2e8f0; transition: color 0.15s; }
+    .star.lit { color: #fbbf24; }
+
+    .rec-card {
+      background: var(--bg-secondary);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      padding: 1.25rem;
+      display: flex;
+      gap: 18px;
+      margin-bottom: 14px;
+      transition: all 0.3s ease;
+    }
+
+    .rec-card:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 8px 25px rgba(0, 0, 0, 0.08);
+      border-color: var(--primary);
+    }
+
+    .rec-icon {
+      width: 52px;
+      height: 52px;
+      border-radius: 12px;
+      background: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.75rem;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+    }
+
+    .rec-title { font-size: 1.1rem; font-weight: 600; }
+    .rec-sub { font-size: 0.9rem; color: var(--text-secondary); margin-top: 4px; }
+
+    .tag {
+      display: inline-block;
+      font-size: 0.8rem;
+      padding: 4px 10px;
+      background: #e0f0ff;
+      color: var(--primary);
+      border-radius: 20px;
+      margin-right: 6px;
+      margin-bottom: 6px;
+    }
+
+    .match-bar {
+      height: 6px;
+      background: #e2e8f0;
+      border-radius: 999px;
+      overflow: hidden;
+      margin-top: 6px;
+    }
+
+    .match-fill {
+      height: 100%;
+      background: linear-gradient(90deg, var(--primary), #60a5fa);
+    }
+
+    .btn-group {
+      display: flex;
+      gap: 12px;
+      margin-top: 2rem;
+      flex-wrap: wrap;
+    }
+
+    .btn {
+      padding: 14px 28px;
+      border: none;
+      border-radius: var(--radius-md);
+      font-weight: 600;
+      font-size: 1rem;
+      cursor: pointer;
+      transition: all 0.2s;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .btn-primary {
+      background: var(--primary);
+      color: white;
+    }
+
+    .btn-primary:hover { background: var(--primary-dark); transform: translateY(-2px); }
+
+    .btn-secondary {
+      background: transparent;
+      border: 1.5px solid var(--border);
+      color: var(--text-secondary);
+    }
+
+    .empty-state {
+      text-align: center;
+      padding: 3rem 1rem;
+      color: var(--text-tertiary);
+      font-size: 1.05rem;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <h1><i class="fas fa-sparkles"></i> Recommendation System</h1>
+    </div>
+
+    <div class="main">
+      <div class="tabs">
+        <div class="tab active" data-tab="movies"><i class="fas fa-film"></i> Movies</div>
+        <div class="tab" data-tab="books"><i class="fas fa-book"></i> Books</div>
+        <div class="tab" data-tab="products"><i class="fas fa-shopping-bag"></i> Products</div>
+      </div>
+
+      <div class="section-title"><i class="fas fa-heart"></i> Your Preferences</div>
+      <div class="pref-grid" id="pref-grid">
+        <div class="pref-chip " onclick="togglePref(&#39;Action&#39;)">Action</div>
+      
+        <div class="pref-chip " onclick="togglePref(&#39;Romance&#39;)">Romance</div>
+      
+        <div class="pref-chip " onclick="togglePref(&#39;Comedy&#39;)">Comedy</div>
+      
+        <div class="pref-chip " onclick="togglePref(&#39;Drama&#39;)">Drama</div>
+      
+        <div class="pref-chip " onclick="togglePref(&#39;Thriller&#39;)">Thriller</div>
+      
+        <div class="pref-chip " onclick="togglePref(&#39;Family&#39;)">Family</div>
+      
+        <div class="pref-chip " onclick="togglePref(&#39;Fantasy&#39;)">Fantasy</div>
+      
+        <div class="pref-chip " onclick="togglePref(&#39;Mass&#39;)">Mass</div>
+      </div>
+
+      <div class="section-title"><i class="fas fa-star"></i> Rate Items You've Experienced</div>
+      <div id="rating-list">
+        <div class="rating-row">
+          <span class="rating-label">RRR</span>
+          <div class="stars">
+            <span class="star " onclick="setRating(&#39;RRR&#39;, 1)">★</span><span class="star " onclick="setRating(&#39;RRR&#39;, 2)">★</span><span class="star " onclick="setRating(&#39;RRR&#39;, 3)">★</span><span class="star " onclick="setRating(&#39;RRR&#39;, 4)">★</span><span class="star " onclick="setRating(&#39;RRR&#39;, 5)">★</span>
+          </div>
+        </div>
+      
+        <div class="rating-row">
+          <span class="rating-label">Pushpa</span>
+          <div class="stars">
+            <span class="star " onclick="setRating(&#39;Pushpa&#39;, 1)">★</span><span class="star " onclick="setRating(&#39;Pushpa&#39;, 2)">★</span><span class="star " onclick="setRating(&#39;Pushpa&#39;, 3)">★</span><span class="star " onclick="setRating(&#39;Pushpa&#39;, 4)">★</span><span class="star " onclick="setRating(&#39;Pushpa&#39;, 5)">★</span>
+          </div>
+        </div>
+      
+        <div class="rating-row">
+          <span class="rating-label">Baahubali</span>
+          <div class="stars">
+            <span class="star " onclick="setRating(&#39;Baahubali&#39;, 1)">★</span><span class="star " onclick="setRating(&#39;Baahubali&#39;, 2)">★</span><span class="star " onclick="setRating(&#39;Baahubali&#39;, 3)">★</span><span class="star " onclick="setRating(&#39;Baahubali&#39;, 4)">★</span><span class="star " onclick="setRating(&#39;Baahubali&#39;, 5)">★</span>
+          </div>
+        </div>
+      
+        <div class="rating-row">
+          <span class="rating-label">Arya</span>
+          <div class="stars">
+            <span class="star " onclick="setRating(&#39;Arya&#39;, 1)">★</span><span class="star " onclick="setRating(&#39;Arya&#39;, 2)">★</span><span class="star " onclick="setRating(&#39;Arya&#39;, 3)">★</span><span class="star " onclick="setRating(&#39;Arya&#39;, 4)">★</span><span class="star " onclick="setRating(&#39;Arya&#39;, 5)">★</span>
+          </div>
+        </div>
+      
+        <div class="rating-row">
+          <span class="rating-label">Magadheera</span>
+          <div class="stars">
+            <span class="star " onclick="setRating(&#39;Magadheera&#39;, 1)">★</span><span class="star " onclick="setRating(&#39;Magadheera&#39;, 2)">★</span><span class="star " onclick="setRating(&#39;Magadheera&#39;, 3)">★</span><span class="star " onclick="setRating(&#39;Magadheera&#39;, 4)">★</span><span class="star " onclick="setRating(&#39;Magadheera&#39;, 5)">★</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="btn-group">
+        <button class="btn btn-primary" onclick="getRecommendations()">
+          <i class="fas fa-wand-magic-sparkles"></i> Get Recommendations
+        </button>
+        <button class="btn btn-secondary" onclick="resetAll()">
+          <i class="fas fa-rotate"></i> Reset
+        </button>
+      </div>
+
+      <div id="results"></div>
+    </div>
+  </div>
+
+  <script>
+    const data = {
+      movies: {
+        prefs: ['Action','Romance','Comedy','Drama','Thriller','Family','Fantasy','Mass'],
+        rateItems: ['RRR','Pushpa','Baahubali','Arya','Magadheera'],
+        items: [
+          {title:'RRR',sub:'Action · Mass · 2022 · SS Rajamouli',icon:'🔥',tags:['Action','Mass'],match:98},
+          {title:'Pushpa: The Rise',sub:'Action · Thriller · 2021 · Sukumar',icon:'🌿',tags:['Action','Thriller'],match:95},
+          {title:'Baahubali: The Beginning',sub:'Fantasy · Action · 2015 · SS Rajamouli',icon:'⚔️',tags:['Fantasy','Action'],match:97},
+          {title:'Magadheera',sub:'Fantasy · Romance · 2009 · SS Rajamouli',icon:'🐉',tags:['Fantasy','Romance'],match:93},
+          {title:'Arya',sub:'Romance · Comedy · 2004 · Sukumar',icon:'💛',tags:['Romance','Comedy'],match:88},
+          {title:'Ala Vaikunthapurramuloo',sub:'Family · Drama · 2020 · Trivikram',icon:'🏡',tags:['Family','Drama'],match:91},
+          {title:'Rangasthalam',sub:'Drama · Action · 2018 · Sukumar',icon:'🎺',tags:['Drama','Action'],match:94},
+          {title:'Sye Raa Narasimha Reddy',sub:'Action · History · 2019 · Surender Reddy',icon:'🗡️',tags:['Action','Mass'],match:87},
+          {title:'Jersey',sub:'Drama · Family · 2019 · Gowtam Tinnanuri',icon:'🏏',tags:['Drama','Family'],match:89},
+          {title:'Uppena',sub:'Romance · Drama · 2021 · Buchi Babu',icon:'🌊',tags:['Romance','Drama'],match:86},
+          {title:'Bheemla Nayak',sub:'Action · Thriller · 2022 · Saagar K Chandra',icon:'💪',tags:['Action','Thriller'],match:85},
+          {title:'Shyam Singha Roy',sub:'Romance · Drama · 2021 · Rahul Sankrityan',icon:'🎭',tags:['Romance','Drama'],match:90},
+          {title:'Julayi',sub:'Comedy · Thriller · 2012 · Trivikram',icon:'😄',tags:['Comedy','Thriller'],match:83},
+          {title:'Ye Maaya Chesave',sub:'Romance · Drama · 2010 · Gautham Menon',icon:'🌹',tags:['Romance','Drama'],match:87},
+          {title:'Kushi',sub:'Comedy · Romance · 2001 · SJ Suryah',icon:'😊',tags:['Comedy','Romance'],match:84},
+          {title:'Athadu',sub:'Action · Thriller · 2005 · Trivikram',icon:'🎯',tags:['Action','Thriller'],match:89},
+          {title:'Vikram Vedha (Telugu)',sub:'Thriller · Action · 2017 · Pushkar-Gayatri',icon:'🃏',tags:['Thriller','Action'],match:88},
+          {title:'Kalki 2898 AD',sub:'Sci-Fi · Fantasy · 2024 · Nag Ashwin',icon:'🤖',tags:['Fantasy','Action','Mass'],match:96},
+        ]
+      },
+      books: {
+        prefs: ['Fantasy','Mystery','Self-Help','Biography','Sci-Fi','Romance','History','Philosophy'],
+        rateItems: ['Atomic Habits','1984','Dune','The Alchemist','Sapiens'],
+        items: [
+          {title:'Atomic Habits',sub:'Self-Help · Productivity · James Clear',icon:'⚡',tags:['Self-Help'],match:96},
+          {title:'Sapiens',sub:'History · Anthropology · Yuval Noah Harari',icon:'🌍',tags:['History'],match:94},
+          {title:'Dune',sub:'Sci-Fi · Epic · Frank Herbert',icon:'🌌',tags:['Sci-Fi','Fantasy'],match:95},
+          {title:'The Alchemist',sub:'Philosophy · Journey · Paulo Coelho',icon:'✨',tags:['Philosophy','Romance'],match:92},
+          {title:'Fourth Wing',sub:'Fantasy · Dragons · Rebecca Yarros',icon:'🐉',tags:['Fantasy','Romance'],match:91},
+          {title:'The Psychology of Money',sub:'Self-Help · Finance · Morgan Housel',icon:'💰',tags:['Self-Help'],match:89},
+          {title:'1984',sub:'Sci-Fi · Dystopia · George Orwell',icon:'📡',tags:['Sci-Fi'],match:93},
+          {title:'Think Again',sub:'Self-Help · Mindset · Adam Grant',icon:'🧠',tags:['Self-Help','Philosophy'],match:87},
+          {title:'A Brief History of Time',sub:'Science · Philosophy · Stephen Hawking',icon:'🔭',tags:['Science','Philosophy'],match:88},
+          {title:'The Silent Patient',sub:'Mystery · Thriller · Alex Michaelides',icon:'🔍',tags:['Mystery'],match:90},
+        ]
+      },
+      products: {
+        prefs: ['Tech','Fashion','Home','Fitness','Gaming','Beauty','Kitchen','Books'],
+        rateItems: ['AirPods Pro','Kindle','Instant Pot','Nike Shoes','MacBook'],
+        items: [
+          {title:'Sony WH-1000XM5',sub:'Tech · Noise Cancelling Headphones',icon:'🎧',tags:['Tech'],match:95},
+          {title:'Apple AirPods Pro',sub:'Tech · Wireless Earbuds · Apple',icon:'🍎',tags:['Tech'],match:93},
+          {title:'Theragun Mini',sub:'Fitness · Muscle Recovery Device',icon:'💪',tags:['Fitness'],match:88},
+          {title:'Dyson Airwrap',sub:'Beauty · Hair Styling Tool',icon:'💨',tags:['Beauty'],match:86},
+          {title:'Kindle Paperwhite',sub:'Books · E-Reader · Amazon',icon:'📖',tags:['Books','Tech'],match:91},
+          {title:'Nike Air Max',sub:'Fashion · Fitness · Running Shoes',icon:'👟',tags:['Fashion','Fitness'],match:89},
+          {title:'Instant Pot Duo',sub:'Kitchen · Pressure Cooker · Multi-use',icon:'🍲',tags:['Kitchen'],match:87},
+          {title:'PS5 Console',sub:'Gaming · Sony · Next-Gen',icon:'🎮',tags:['Gaming','Tech'],match:94},
+          {title:'Lego Technic',sub:'Gaming · Creative · Build Set',icon:'🧱',tags:['Gaming'],match:82},
+          {title:'Vitamix Blender',sub:'Kitchen · Health · High Performance',icon:'🥤',tags:['Kitchen','Fitness'],match:84},
+        ]
+      }
+    };
+
+    let currentTab = 'movies';
+    let selectedPrefs = new Set();
+    let ratings = {};
+
+    function switchTab(tab) {
+      currentTab = tab;
+      selectedPrefs.clear();
+      ratings = {};
+      document.querySelectorAll('.tab').forEach(t => t.classList.toggle('active', t.dataset.tab === tab));
+      document.getElementById('results').innerHTML = '';
+      renderUI();
+    }
+
+    function renderUI() {
+      const d = data[currentTab];
+      document.getElementById('pref-grid').innerHTML = d.prefs.map(p => `
+        <div class="pref-chip ${selectedPrefs.has(p) ? 'sel' : ''}" onclick="togglePref('${p}')">${p}</div>
+      `).join('');
+
+      document.getElementById('rating-list').innerHTML = d.rateItems.map(item => `
+        <div class="rating-row">
+          <span class="rating-label">${item}</span>
+          <div class="stars">
+            ${[1,2,3,4,5].map(s => `<span class="star ${ratings[item] >= s ? 'lit' : ''}" onclick="setRating('${item}', ${s})">★</span>`).join('')}
+          </div>
+        </div>
+      `).join('');
+    }
+
+    function togglePref(p) {
+      selectedPrefs.has(p) ? selectedPrefs.delete(p) : selectedPrefs.add(p);
+      renderUI();
+    }
+
+    function setRating(item, value) {
+      ratings[item] = value;
+      renderUI();
+    }
+
+    function getRecommendations() {
+      const d = data[currentTab];
+      const ratedValues = Object.values(ratings).filter(v => v > 0);
+      const avgRating = ratedValues.length ? ratedValues.reduce((a, b) => a + b, 0) / ratedValues.length : 3;
+      const boost = avgRating >= 4 ? 1.08 : avgRating <= 2 ? 0.9 : 1;
+
+      let filtered = d.items
+        .filter(item => selectedPrefs.size === 0 || item.tags.some(t => selectedPrefs.has(t)))
+        .map(item => ({ ...item, match: Math.min(99, Math.round(item.match * boost)) }))
+        .sort((a, b) => b.match - a.match);
+
+      const resultsDiv = document.getElementById('results');
+
+      if (filtered.length === 0) {
+        resultsDiv.innerHTML = `<div class="empty-state">No matches found. Try selecting different preferences.</div>`;
+        return;
+      }
+
+      resultsDiv.innerHTML = `
+        <div class="section-title" style="margin-top:2rem">
+          <i class="fas fa-check-circle"></i> ${filtered.length} Personalized Recommendations
+        </div>
+        ${filtered.map(item => `
+          <div class="rec-card">
+            <div class="rec-icon">${item.icon}</div>
+            <div style="flex:1">
+              <div class="rec-title">${item.title}</div>
+              <div class="rec-sub">${item.sub}</div>
+              <div style="margin-top:10px">
+                ${item.tags.map(tag => `<span class="tag">${tag}</span>`).join('')}
+              </div>
+              <div style="margin-top:12px">
+                <div style="font-size:0.85rem;font-weight:600;color:var(--primary)">${item.match}% Match</div>
+                <div class="match-bar"><div class="match-fill" style="width:${item.match}%"></div></div>
+              </div>
+            </div>
+          </div>
+        `).join('')}
+      `;
+    }
+
+    function resetAll() {
+      selectedPrefs.clear();
+      ratings = {};
+      document.getElementById('results').innerHTML = '';
+      renderUI();
+    }
+
+    // Tab Click Handlers
+    document.querySelectorAll('.tab').forEach(tab => {
+      tab.addEventListener('click', () => switchTab(tab.dataset.tab));
+    });
+
+    // Initial Render
+    renderUI();
+  </script>
+
+</body></html>
